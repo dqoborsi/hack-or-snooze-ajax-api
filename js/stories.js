@@ -54,15 +54,16 @@ function putStoriesOnPage() {
 async function submitNewStory(e){
   e.preventDefault();
 
-  let title = $("#create-title").val();
-  let url = $("create-url").val();
-  let author = $("#create-author").val();
-  let username = currentUser.username;
-  let storyData = {title, url, author, username};
-
+  const title = $("#create-title").val();
+  const url = $("#create-url").val();
+  const author = $("#create-author").val();
+  const username = currentUser.username;
+  const storyData = {title, url, author, username};
+  console.log(currentUser);
+  console.log(storyData);
   // storyList is an instance of StoryList, so it has addStory method (which is not static)
-  let story = await storyList.addStory(currentUser, storyData);
-  let $story = generateStoryMarkup(story);
+  const story = await storyList.addStory(currentUser, storyData);
+  const $story = generateStoryMarkup(story);
   $allStoriesList.prepend($story);
 }
 

@@ -79,7 +79,7 @@ class StoryList {
     let token = user.loginToken;
     let response = await axios({
       method: "POST",
-      url: `https://hack-or-snooze-v3.herokuapp.com/stories`,
+      url: `${BASE_URL}/stories`,
       data: {
         "token": token,
         "story": {
