@@ -34,3 +34,13 @@ function updateNavOnLogin() {
   $navLogOut.show();
   $navUserProfile.text(`${currentUser.username}`).show();
 }
+
+// called when user clicks submit in navbar. runs the addStory function we made in models.js, then appends it to the top of the stories HTML list (UI)
+
+function navSubmitStoryClick(e) {
+  hidePageComponents();
+  $allStoriesList.show();
+  $submitForm.show();
+}
+
+$navSubmitStory.on("click", navSubmitStoryClick);

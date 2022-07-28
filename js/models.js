@@ -76,10 +76,23 @@ class StoryList {
 
   async addStory(user, newStory) {
     // UNIMPLEMENTED: complete this function!
-    // <ol id="all-stories-list" class="stories-list"></ol>
-    // $("#all-stories-list").append(newStory);
-    let add = axios.post(/*story data at the right location in API*/)
-    return new Story({ newStory.title, newStory.author, newStory.url })
+    let token = user.loginToken;
+    let response = await axios({
+      method: "POST",
+      url: `https://hack-or-snooze-v3.herokuapp.com/stories`,
+      data: {
+        "token": token,
+        "story": {
+            "author": `${newStory.author}`,
+            "title": `${newStory.title}`,
+            "url": `${newStory.url}`
+        }
+      }
+    })
+    let newStoryToAdd = new Story(response.data.story);
+    this.stories.unshift(newStoryToAdd);
+    user.ownStories.unshift(newStoryToAdd);
+    return newStoryToAdd;
   }
 }
 

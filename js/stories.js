@@ -50,3 +50,20 @@ function putStoriesOnPage() {
 
   $allStoriesList.show();
 }
+
+async function submitNewStory(e){
+  e.preventDefault();
+
+  let title = $("#create-title").val();
+  let url = $("create-url").val();
+  let author = $("#create-author").val();
+  let username = currentUser.username;
+  let storyData = {title, url, author, username};
+
+  // storyList is an instance of StoryList, so it has addStory method (which is not static)
+  let story = await storyList.addStory(currentUser, storyData);
+  let $story = generateStoryMarkup(story);
+  $allStoriesList.prepend($story);
+}
+
+$submitForm.on('submit', submitNewStory)
