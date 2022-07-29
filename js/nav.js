@@ -43,4 +43,17 @@ function navSubmitStoryClick(e) {
   $submitForm.show();
 }
 
+function navFavsClick(e){
+  hidePageComponents();
+  putFavsListOnPg();
+}
+
+function navToMyStories(e){
+  hidePageComponents();
+  putUserStoriesOnPg();
+  $ownStories.show();
+}
+
 $navSubmitStory.on("click", navSubmitStoryClick);
+$navFavorites.on("click", navFavsClick);
+$navStories.on('click', navToMyStories);

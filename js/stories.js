@@ -19,12 +19,19 @@ async function getAndShowStoriesOnStart() {
  * Returns the markup for the story.
  */
 
-function generateStoryMarkup(story) {
+function generateStoryMarkup(story, showDeleteBtn = false) {
   // console.debug("generateStoryMarkup", story);
 
   const hostName = story.getHostName();
+
+  const showStar = !!currentUser;
+
+  // <i class="far fa-star"></i>
+
   return $(`
       <li id="${story.storyId}">
+        ${showDeleteBtn ? getDeleteBtnHTML() : ""}
+        ${showStar ? getStarHTML(story, currentUser) : ''}
         <a href="${story.url}" target="a_blank" class="story-link">
           ${story.title}
         </a>
@@ -35,7 +42,25 @@ function generateStoryMarkup(story) {
     `);
 }
 
+function getDeleteBtnHTML() {
+  return `
+    <span class="trash-can">
+      <i class="fas fa-trash-alt"></i>
+    </span>
+  `
+}
+
 /** Gets list of stories from server, generates their HTML, and puts on page. */
+
+function getStarHTML(story, user){
+  const isFavorite = user.isFavorite(story);
+  const starType = isFavorite ? "fas" : "far";
+  return `
+    <span class="star">
+      <i class="${starType} fa-star"></i>
+    </span>
+  `
+}
 
 function putStoriesOnPage() {
   console.debug("putStoriesOnPage");
@@ -54,17 +79,83 @@ function putStoriesOnPage() {
 async function submitNewStory(e){
   e.preventDefault();
 
-  const title = $("#create-title").val();
-  const url = $("#create-url").val();
-  const author = $("#create-author").val();
+  let title = $("#create-title").val();
+  // URL MUST HAVE HTTPS:// BEFORE OR GIVES 400 ERROR
+  let url = $("#create-url").val();
+  let author = $("#create-author").val();
   const username = currentUser.username;
   const storyData = {title, url, author, username};
-  console.log(currentUser);
-  console.log(storyData);
   // storyList is an instance of StoryList, so it has addStory method (which is not static)
   const story = await storyList.addStory(currentUser, storyData);
   const $story = generateStoryMarkup(story);
   $allStoriesList.prepend($story);
+  $submitForm.toggle('.hidden');
 }
 
-$submitForm.on('submit', submitNewStory)
+async function toggleFavorite(e) {
+  const $tgt = $(e.target);
+  const $closestLi = $tgt.closest('li');
+  const storyId = $closestLi.attr('id');
+  const story = storyList.stories.find(s => s.storyId === storyId);
+
+  if ($tgt.hasClass("fas")) {
+    await currentUser.removeFavorite(story);
+    $tgt.closest('i').toggleClass('fas far');
+  } else {
+    await currentUser.addFavorite(story);
+    $tgt.closest("i").toggleClass("fas far");
+  }
+}
+
+function putFavsListOnPg(){
+  $favoritedStories.empty();
+
+  if (currentUser.favorites.length === 0) {
+    $favoritedStories.append('<h3>No favorites yet!</h3>')
+  }
+  for (let story of currentUser.favorites) {
+    const $story = generateStoryMarkup(story);
+    $favoritedStories.append($story);
+  }
+
+  $favoritedStories.show();
+}
+
+async function deleteStory(e) {
+  const $closestLi = $(e.target).closest('li');
+  const storyId = $closestLi.attr('id');
+
+  await storyList.removeStory(currentUser, storyId);
+
+  await putUserStoriesOnPg();
+}
+
+function putUserStoriesOnPg() {
+  $ownStories.empty();
+
+  if (currentUser.ownStories.length === 0) {
+    $ownStories.append('<h3>No stories added by you yet!</h3>');
+  } else {
+    for (let story of currentUser.ownStories) {
+      let $story = generateStoryMarkup(story, true);
+      $ownStories.append($story);
+    }
+  }
+
+  $ownStories.show();
+}
+
+async function deleteStory(e){
+  const $closestLi = $(e.target).closest('li');
+  const storyId = $closestLi.attr('id');
+
+  await storyList.removeStory(currentUser, storyId);
+
+  await putUserStoriesOnPg();
+}
+
+$ownStories.on('click', '.trash-can', deleteStory);
+
+$submitForm.on('submit', submitNewStory);
+$allStoriesList.on('click', '.star', toggleFavorite);
+$favoritedStories.on('click', '.star', toggleFavorite);
