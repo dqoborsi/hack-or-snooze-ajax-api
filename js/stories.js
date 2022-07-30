@@ -155,7 +155,6 @@ async function deleteStory(e){
 }
 
 $ownStories.on('click', '.trash-can', deleteStory);
-
 $submitForm.on('submit', submitNewStory);
 $allStoriesList.on('click', '.star', toggleFavorite);
 $favoritedStories.on('click', '.star', toggleFavorite);
