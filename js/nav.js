@@ -37,18 +37,18 @@ function updateNavOnLogin() {
 
 // called when user clicks submit in navbar. runs the addStory function we made in models.js, then appends it to the top of the stories HTML list (UI)
 
-function navSubmitStoryClick(e) {
+function navSubmitStoryClick() {
   hidePageComponents();
   $allStoriesList.show();
   $submitForm.show();
 }
 
-function navFavsClick(e){
+function navFavsClick(){
   hidePageComponents();
   putFavsListOnPg();
 }
 
-function navToMyStories(e){
+function navToMyStories(){
   hidePageComponents();
   putUserStoriesOnPg();
   $ownStories.show();
